@@ -89,8 +89,13 @@ func run(ctx context.Context, setImage func(imagePath string) error) {
 		imageIndicies := rand.Perm(len(imageFiles))
 		for _, index := range imageIndicies {
 			imagePath := filepath.Join(directory, imageFiles[index])
-			if err := setImage(imagePath); err != nil {
-				log.Fatalln("Encountered an error when setting the background:", err)
+			if _, err := os.Stat(imagePath); err == nil {
+				if err := setImage(imagePath); err != nil {
+					log.Fatalln("Encountered an error when setting the background:", err)
+				}
+			} else {
+				log.Printf("%s doesn't appear to exist. Re-scanning the directory for images.", imagePath)
+				break
 			}
 
 			select {
