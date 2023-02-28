@@ -2,17 +2,15 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 	"math/rand"
 	"os"
 	"os/signal"
 	"path/filepath"
-	"strconv"
 	"syscall"
 	"time"
 )
-
-const usage = "Usage: bgslide /path/to/wallpapers intervalSeconds"
 
 const (
 	jpg  = ".jpg"
@@ -20,8 +18,28 @@ const (
 	png  = ".png"
 )
 
-func main() {
+var (
+	directory string
+	interval  time.Duration
+)
+
+func init() {
 	log.SetFlags(0)
+	home, err := os.UserHomeDir()
+	if err == nil {
+		home = filepath.Join(home, "Pictures")
+	}
+	flag.StringVar(&directory, "dir", home, "The directory containing the wallpapers.")
+	flag.DurationVar(&interval, "interval", 30*time.Minute, "The interval for changing wallpaper. E.g. 300s, 5m, 1h. Minimum of 5m")
+	flag.Parse()
+
+	if err != nil || interval < 5*time.Minute {
+		flag.PrintDefaults()
+		os.Exit(0)
+	}
+}
+
+func main() {
 	ctx := cancelCtxOnSigterm(context.Background())
 	run(ctx, SetImage)
 }
@@ -50,19 +68,10 @@ func cancelCtxOnSigterm(ctx context.Context) context.Context {
 }
 
 func run(ctx context.Context, setImage func(imagePath string) error) {
-	if len(os.Args) < 3 {
-		log.Fatalln(usage)
-	}
-
-	wallpaperDir := os.Args[1]
-	interval, err := strconv.ParseInt(os.Args[2], 10, 0)
-	if err != nil {
-		log.Fatalln(usage)
-	}
-	ticker := time.NewTicker(time.Duration(interval) * time.Second)
+	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 	for {
-		dir, err := os.ReadDir(wallpaperDir)
+		dir, err := os.ReadDir(directory)
 		if err != nil {
 			log.Fatalln(err.Error())
 		}
@@ -73,10 +82,13 @@ func run(ctx context.Context, setImage func(imagePath string) error) {
 				imageFiles = append(imageFiles, file.Name())
 			}
 		}
+		if len(imageFiles) < 2 {
+			log.Fatalf("%s needs more than 1 image for a slideshow.", directory)
+		}
 
 		imageIndicies := rand.Perm(len(imageFiles))
 		for _, index := range imageIndicies {
-			imagePath := filepath.Join(wallpaperDir, imageFiles[index])
+			imagePath := filepath.Join(directory, imageFiles[index])
 			if err := setImage(imagePath); err != nil {
 				log.Fatalln("Encountered an error when setting the background:", err)
 			}
