@@ -23,5 +23,5 @@ const (
 func SetImage(imagePath string) error {
 	imagePathPtr, _ := windows.UTF16PtrFromString(imagePath)
 	procSystemParamInfo.Call(spiSetDeskWallpaper, uiParam, uintptr(unsafe.Pointer(imagePathPtr)), spifUpdateIniFile)
-	return nil
+	return nil // TODO error handling
 }

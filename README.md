@@ -1,21 +1,23 @@
 # bgslide
-An application to set the desktop background to be a slideshow of images.
+A cross-platform Go application to set the desktop background to be a slideshow of images
 
 ## Motivations
-I use Pop!_OS+GNOME and Windows. I wanted to set my backgrounds as a slideshow of photos that I have taken.
+I use Pop!_OS+GNOME, Windows, and Mac. I wanted to set my backgrounds as a slideshow of photos that I have taken.
 
 - Pop!_OS doesn't appear to have an option to set the desktop background as a slideshow of images.
 - Windows allows slideshows but sets a different image on multiple displays - I wanted the same image on both displays.
+- I use Mac for work and firgured why not make it compatible with all 3 🙃
 - I wanted an excuse to practice Go.
 
 ## Supports
 - Linux
     - GNOME Desktop Environments
 - Windows
+- Mac
 
 ## Building/Installing
 ### Linux
-Run your standard `go build` and `go build install`
+`go build && go install`
 
 ### Windows
 Build with flags so Windows doesn't open a terminal window when running the binary.
@@ -23,6 +25,9 @@ Build with flags so Windows doesn't open a terminal window when running the bina
 `go build -ldflags -H=windowsgui`
 
 `go install -ldflags -H=windowsgui`
+
+### Mac
+`go build && go install`
 
 ## Usage
 The `-dir` flag will default to the `Pictures` folder in your home directory if the environment variable `HOME` or `USERPROFILE` exists on your system.
