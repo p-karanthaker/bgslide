@@ -13,7 +13,7 @@ I use Pop!_OS+GNOME, Windows, and Mac. I wanted to set my backgrounds as a slide
 - Linux
     - GNOME Desktop Environments
 - Windows
-- Mac (not fully working)
+- Mac (working but ensure that Mac setting for automatically changing picture are disabled)
 
 ## Building/Installing
 ### Linux
